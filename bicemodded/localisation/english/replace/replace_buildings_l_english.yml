@@ -1,0 +1,17 @@
+﻿l_english:
+ 
+ #TW Buildings
+ synthetic_rubber_refinery:0 "Synthetic Rubber Refinery"
+ synthetic_rubber_refinery_plural:0 "Synthetic Rubber Refineries"
+ #synthetic_rubber_refinery_desc:0 "This building provides the state with +1 £resources_strip|3 and +2 £resources_strip|1."
+ synthetic_rubber_refinery_desc:0 "This building provides the state with"
+ synthetic_rubber_refinery_amount:0 "$VALUE|Y0=$"
+ synthetic_rubber_refinery_resource:0 "£resources_strip|$FRAME$"
+ 
+ steel_refinery:0 "Steel Refinery"
+ steel_refinery_plural:0 "Steel Refineries"
+ #steel_refinery_desc:0 "This building provides the state with +1 £resources_strip|3 and +2 £resources_strip|1."
+ steel_refinery_desc:0 "This building provides the state with"
+ steel_refinery_amount:0 "$VALUE|Y0=$"
+ steel_refinery_resource:0 "£resources_strip|$FRAME$"
+ 

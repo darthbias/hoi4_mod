@@ -39,7 +39,7 @@ spriteTypes = {
 
 	spriteType = {
 		name = "GFX_shared_constructions"
-		textureFile = "gfx//interface//intel_ledger//economy_tab_icon_tw.tga"
+		textureFile = "gfx//interface//shared_constructions.dds"
 	}
 
 	spriteType = {
@@ -48,7 +48,7 @@ spriteTypes = {
 	}
 	spriteType = {
 		name = "GFX_constructions_bg4"
-		textureFile = "gfx//interface//constructions_bg4_tw.tga"
+		textureFile = "gfx//interface//constructions_bg4.dds"
 	}
 
 	spriteType = {
@@ -90,7 +90,7 @@ spriteTypes = {
 		name = "GFX_non_available_factory_icon"
 		textureFile = "gfx//interface//non_available_factory_icon.dds"
 	}
-	
+
 	spriteType = {
 		name = "GFX_ongoing_market_contract_icon"
 		textureFile = "gfx//interface//construction//ongoing_market_contract_icon.dds"
@@ -112,10 +112,10 @@ spriteTypes = {
 		textureFile = "gfx//interface//construction_entry_bg.dds"
 		effectFile = "gfx/FX/buttonstate_nodowneffect.lua"
 	}
-
+	
 	spriteType = {
 		name = "GFX_convert_ic_button"
-		textureFile = "gfx//interface//convert_ic_button.dds"
+		textureFile = "gfx//interface//buildings//convert_ic_button.dds"
 	}
 
 	spriteType = {
@@ -126,11 +126,6 @@ spriteTypes = {
 	spriteType = {
 		name = "GFX_macrobuild_header_bg"
 		textureFile = "gfx//interface//macrobuild_header_bg.dds"
-	}
-	
-	spriteType = {
-		name = "GFX_header_bg_tw"
-		texturefile = "gfx/interface/header_bg_tw.tga"
 	}
 
 	spriteType = {
@@ -175,6 +170,16 @@ spriteTypes = {
 	}
 	
 	progressbartype = {
+		name = "GFX_breakthrough_progressbar"
+		color = { 0.0 0.5 0.0 }
+		colortwo = { 1.0 0.0 0.0 }
+		textureFile1 = "gfx/interface/special_project/breakthrough_progressbar.dds"
+		textureFile2 = "gfx/interface/special_project/breakthrough_progressbar_bg.dds"
+		size = { x = 60 y = 8 }
+		effectFile = "gfx/FX/progress_startend.lua"
+	}
+
+	progressbartype = {
 		name = "GFX_construction_progressbar"
 		color = { 0.0 0.5 0.0 }
 		colortwo = { 1.0 0.0 0.0 }
@@ -183,6 +188,7 @@ spriteTypes = {
 		size = { x = 60 y = 8 }
 		effectFile = "gfx/FX/progress_startend.lua"
 	}
+	
 	
 	frameAnimatedSpriteType = {
 		name = "GFX_tutorial_building_icon_glow"

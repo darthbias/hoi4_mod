@@ -1,9 +1,0 @@
-﻿air_wings = {
-	291 = { 
-		
-		fighter_equipment_0 = {
-			owner = "IRQ" 
-			amount = 100
-		}
-	}
-}
