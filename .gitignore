@@ -1,0 +1,13 @@
+# Docs
+docs/_build
+
+# Windows system files
+desktop.ini
+
+# Root-level text files (rules, analysis, etc.)
+/*.txt
+
+# Executables
+*.exe
+goal_shinemaker.exe
+
