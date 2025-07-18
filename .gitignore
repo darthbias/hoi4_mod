@@ -4,10 +4,16 @@ docs/_build
 # Windows system files
 desktop.ini
 
-# Root-level text files (rules, analysis, etc.)
-/*.txt
-
 # Executables
 *.exe
 goal_shinemaker.exe
 
+# Python cache files
+__pycache__/
+*.pyc
+
+# Generated vanilla data - do not commit to feature branches
+/source_data/vanilla_base/
+
+# Final mod build output
+/build/
