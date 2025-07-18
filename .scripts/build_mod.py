@@ -23,15 +23,22 @@ def dict_to_pdx_string(data, indent=0):
             s += dict_to_pdx_string(value, indent + 1)
             s += f"{tabs}}}\n"
         elif isinstance(value, list):
-            # Handle lists of complex items (e.g., list of focuses)
+            # Handle lists of items. This is the crucial change.
             for item in value:
-                s += f"{tabs}{key} = {{\n"
-                s += dict_to_pdx_string(item, indent + 1)
-                s += f"{tabs}}}\n"
+                if isinstance(item, dict):
+                    # This is a list of complex blocks, like focuses or ideas.
+                    # Each one gets its own `key = { ... }` block.
+                    s += f"{tabs}{key} = {{\n"
+                    s += dict_to_pdx_string(item, indent + 1)
+                    s += f"{tabs}}}\n"
+                else:
+                    # This is a list of simple values, like prerequisites.
+                    # Each one gets its own `key = value` line.
+                    s += f"{tabs}{key} = {item}\n"
         else:
             # Handle simple key-value pairs
             # Add quotes around values that are strings but not simple yes/no/numbers
-            if isinstance(value, str) and value not in ['yes', 'no'] and not value.replace('.','',1).isdigit():
+            if isinstance(value, str) and value not in ['yes', 'no'] and not str(value).replace('.','',1).isdigit():
                  s += f'{tabs}{key} = "{value}"\n'
             else:
                  s += f"{tabs}{key} = {value}\n"
@@ -39,47 +46,70 @@ def dict_to_pdx_string(data, indent=0):
 
 def main():
     """
-    Main function to build the mod.
-    As a first test, we will just "rebuild" one of the vanilla files we parsed
-    to prove that our parser and generator can work together.
+    Main function to build the mod. It reads all YAML files from a source
+    directory and generates the final Paradox-formatted text files.
     """
     # --- CONFIGURATION ---
     # The source of our parsed vanilla data
-    vanilla_source_dir = os.path.join(os.path.dirname(__file__), '..', 'source_data', 'vanilla_base')
+    script_dir = os.path.dirname(__file__)
+    vanilla_source_dir = os.path.join(script_dir, '..', 'source_data', 'vanilla_base')
+    mod_source_dir = os.path.join(script_dir, '..', 'source_data', 'total_war_mod')
     # The final output directory for the playable mod
-    build_dir = os.path.join(os.path.dirname(__file__), '..', 'build', 'total_war_mod')
+    build_dir = os.path.join(script_dir, '..', 'build', 'total_war_mod')
 
     # --- SCRIPT ---
-    # Let's use a simple file for our first test.
-    test_input_filename = "common/ideologies/00_ideologies.yml"
-    test_output_filename = "common/ideologies/00_ideologies.txt"
+    print(f"Starting mod build process...")
 
-    input_file_path = os.path.join(vanilla_source_dir, test_input_filename)
-    output_file_path = os.path.join(build_dir, test_output_filename)
+    # 1. Gather all files, with mod files overriding vanilla files.
+    files_to_build = {}
+    # First, add all vanilla files to the build list.
+    if os.path.exists(vanilla_source_dir):
+        for root, _, files in os.walk(vanilla_source_dir):
+            for filename in files:
+                if filename.endswith(".yml"):
+                    full_path = os.path.join(root, filename)
+                    relative_path = os.path.relpath(full_path, vanilla_source_dir)
+                    files_to_build[relative_path] = full_path
+    else:
+        print(f"[WARNING] Vanilla source directory not found: {vanilla_source_dir}")
+        print("Please ensure the parser has run successfully.")
 
-    if not os.path.exists(input_file_path):
-        print(f"[ERROR] Test input file not found: {input_file_path}")
-        print("Please ensure the parser has run successfully and the file exists.")
-        return
+    # Second, walk through the mod directory and add/overwrite files.
+    if os.path.exists(mod_source_dir):
+        for root, _, files in os.walk(mod_source_dir):
+            for filename in files:
+                if filename.endswith(".yml"):
+                    full_path = os.path.join(root, filename)
+                    relative_path = os.path.relpath(full_path, mod_source_dir)
+                    files_to_build[relative_path] = full_path # This adds new files and overwrites vanilla ones
 
-    print(f"--- Rebuilding Test File: {test_input_filename} ---")
+    # 2. Build all files in the final list.
+    print(f"Found {len(files_to_build)} files to build.")
+    for relative_path, input_file_path in files_to_build.items():
+        for filename in files:
+            if not filename.endswith(".yml"):
+                continue
 
-    # 1. Read the YAML data
-    print("  -> Reading YAML source...")
-    with open(input_file_path, 'r', encoding='utf-8') as f:
-        data = yaml.safe_load(f)
+            # Change the extension from .yml to .txt for the output
+            output_file_path_no_ext, _ = os.path.splitext(os.path.join(build_dir, relative_path))
+            output_file_path = output_file_path_no_ext + ".txt"
 
-    # 2. Convert data to Paradox Script string
-    print("  -> Generating Paradox script...")
-    pdx_content = dict_to_pdx_string(data)
+            print(f"\n--- Building: {relative_path} ---")
+            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+            
+            try:
+                with open(input_file_path, 'r', encoding='utf-8') as f:
+                    data = yaml.safe_load(f)
+                
+                pdx_content = dict_to_pdx_string(data)
+                
+                with open(output_file_path, 'w', encoding='utf-8-sig') as f:
+                    f.write(pdx_content)
+                print(f"  -> Successfully built to: {os.path.relpath(output_file_path, build_dir)}")
+            except Exception as e:
+                print(f"  [ERROR] Failed to build {filename}: {e}")
 
-    # 3. Write the final .txt file
-    print(f"  -> Writing to build directory: {os.path.relpath(output_file_path, build_dir)}")
-    os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-    with open(output_file_path, 'w', encoding='utf-8-sig') as f:
-        f.write(pdx_content)
-
-    print("\nTest build complete! Check the 'build' folder.")
+    print("\n\nFull build process complete!")
 
 if __name__ == "__main__":
     main()
