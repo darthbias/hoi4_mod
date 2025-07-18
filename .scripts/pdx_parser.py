@@ -117,7 +117,7 @@ def main():
     vanilla_root = "c:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"
     # A list of all top-level directories we want to parse from the vanilla game.
     # We can add more here as needed (e.g., "decisions", "interface").
-    target_directories = ["common", "events", "gfx"]
+    target_directories = ["common", "events", "gfx", "interface"]
     
     # --- SCRIPT ---
     output_dir_root = os.path.join(os.path.dirname(__file__), '..', 'source_data', 'vanilla_base')
@@ -136,7 +136,7 @@ def main():
         for root, _, files in os.walk(input_dir_path):
             for filename in files:
                 # We expand this to include other relevant file types
-                if not filename.endswith((".txt", ".gfx")):
+                if not filename.endswith((".txt", ".gfx", ".gui", ".asset")):
                     continue
 
                 input_file_path = os.path.join(root, filename)

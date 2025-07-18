@@ -3,6 +3,7 @@
 
 import yaml
 import os
+import shutil
 
 def dict_to_pdx_string(data, indent=0):
     """
@@ -51,59 +52,64 @@ def main():
     """
     # --- CONFIGURATION ---
     # The source of our parsed vanilla data
-    script_dir = os.path.dirname(__file__)
-    vanilla_source_dir = os.path.join(script_dir, '..', 'source_data', 'vanilla_base')
-    mod_source_dir = os.path.join(script_dir, '..', 'source_data', 'total_war_mod')
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    vanilla_source_dir = os.path.join(project_root, 'source_data', 'vanilla_base')
+    mod_source_dir = os.path.join(project_root, 'source_data', 'total_war_mod')
     # The final output directory for the playable mod
-    build_dir = os.path.join(script_dir, '..', 'build', 'total_war_mod')
+    build_dir = os.path.join(project_root, 'build', 'total_war_mod')
 
     # --- SCRIPT ---
     print(f"Starting mod build process...")
 
-    # 1. Gather all files, with mod files overriding vanilla files.
-    files_to_build = {}
-    # First, add all vanilla files to the build list.
-    if os.path.exists(vanilla_source_dir):
-        for root, _, files in os.walk(vanilla_source_dir):
+    # 1. Gather all source files, with mod files overriding vanilla files.
+    source_files = {}
+    for source_dir in [vanilla_source_dir, mod_source_dir]:
+        if not os.path.exists(source_dir):
+            if source_dir == vanilla_source_dir:
+                print(f"[WARNING] Vanilla source directory not found: {vanilla_source_dir}")
+            continue
+        
+        for root, _, files in os.walk(source_dir):
             for filename in files:
-                if filename.endswith(".yml"):
+                # We care about .yml for generation and .lua for copying
+                if filename.endswith((".yml", ".lua")):
                     full_path = os.path.join(root, filename)
-                    relative_path = os.path.relpath(full_path, vanilla_source_dir)
-                    files_to_build[relative_path] = full_path
-    else:
-        print(f"[WARNING] Vanilla source directory not found: {vanilla_source_dir}")
-        print("Please ensure the parser has run successfully.")
+                    relative_path = os.path.relpath(full_path, source_dir)
+                    source_files[relative_path] = full_path # Overwrites vanilla with mod version
 
-    # Second, walk through the mod directory and add/overwrite files.
-    if os.path.exists(mod_source_dir):
-        for root, _, files in os.walk(mod_source_dir):
-            for filename in files:
-                if filename.endswith(".yml"):
-                    full_path = os.path.join(root, filename)
-                    relative_path = os.path.relpath(full_path, mod_source_dir)
-                    files_to_build[relative_path] = full_path # This adds new files and overwrites vanilla ones
+    # 2. Process all gathered files.
+    print(f"Found {len(source_files)} source files to process.")
+    for relative_path, input_file_path in source_files.items():
+        
+        # Determine output path and action based on file type
+        if input_file_path.endswith(".yml"):
+            output_file_path_no_ext, _ = os.path.splitext(os.path.join(build_dir, relative_path))
+            output_file_path = output_file_path_no_ext + ".txt"
+            action = "build"
+        elif input_file_path.endswith(".lua"):
+            output_file_path = os.path.join(build_dir, relative_path)
+            action = "copy"
+        else:
+            continue # Should not happen with our filter
 
-    # 2. Build all files in the final list.
-    print(f"Found {len(files_to_build)} files to build.")
-    for relative_path, input_file_path in files_to_build.items():
-        # Change the extension from .yml to .txt for the output
-        output_file_path_no_ext, _ = os.path.splitext(os.path.join(build_dir, relative_path))
-        output_file_path = output_file_path_no_ext + ".txt"
-
-        print(f"\n--- Building: {relative_path} ---")
+        print(f"\n--- Processing: {relative_path} ---")
         os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
         
         try:
-            with open(input_file_path, 'r', encoding='utf-8') as f:
-                data = yaml.safe_load(f)
+            if action == "build":
+                with open(input_file_path, 'r', encoding='utf-8') as f:
+                    data = yaml.safe_load(f)
+                pdx_content = dict_to_pdx_string(data)
+                with open(output_file_path, 'w', encoding='utf-8-sig') as f:
+                    f.write(pdx_content)
+                print(f"  -> Successfully built to: {os.path.relpath(output_file_path, build_dir)}")
             
-            pdx_content = dict_to_pdx_string(data)
-            
-            with open(output_file_path, 'w', encoding='utf-8-sig') as f:
-                f.write(pdx_content)
-            print(f"  -> Successfully built to: {os.path.relpath(output_file_path, build_dir)}")
+            elif action == "copy":
+                shutil.copy2(input_file_path, output_file_path)
+                print(f"  -> Successfully copied to: {os.path.relpath(output_file_path, build_dir)}")
+
         except Exception as e:
-            print(f"  [ERROR] Failed to build {relative_path}: {e}")
+            print(f"  [ERROR] Failed to process {relative_path}: {e}")
 
     print("\n\nFull build process complete!")
 
