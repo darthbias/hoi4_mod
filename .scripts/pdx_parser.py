@@ -115,52 +115,56 @@ def main():
     """
     # --- CONFIGURATION ---
     vanilla_root = "c:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"
-    # We'll parse the 'common' directory as our first major task.
-    # You can change this to 'events', 'gfx', etc. later.
-    target_directory = "common"
+    # A list of all top-level directories we want to parse from the vanilla game.
+    # We can add more here as needed (e.g., "decisions", "interface").
+    target_directories = ["common", "events", "gfx"]
     
     # --- SCRIPT ---
-    input_dir_path = os.path.join(vanilla_root, target_directory)
     output_dir_root = os.path.join(os.path.dirname(__file__), '..', 'source_data', 'vanilla_base')
 
-    if not os.path.exists(input_dir_path):
-        print(f"[ERROR] Vanilla directory not found at: {input_dir_path}")
-        print("Please ensure the VANILLA_ROOT path in the script is correct.")
-        return
+    for target_directory in target_directories:
+        input_dir_path = os.path.join(vanilla_root, target_directory)
 
-    print(f"Starting batch parse of directory: {input_dir_path}")
+        if not os.path.exists(input_dir_path):
+            print(f"[WARNING] Vanilla directory not found, skipping: {input_dir_path}")
+            continue
 
-    for root, _, files in os.walk(input_dir_path):
-        for filename in files:
-            if not filename.endswith(".txt"):
-                continue
+        print(f"\n==================================================")
+        print(f"Starting batch parse of directory: {target_directory}")
+        print(f"==================================================")
 
-            input_file_path = os.path.join(root, filename)
-            relative_path = os.path.relpath(input_file_path, vanilla_root)
-            output_file_path_no_ext, _ = os.path.splitext(os.path.join(output_dir_root, relative_path))
-            output_file_path = output_file_path_no_ext + ".yml"
-
-            print(f"\n--- Processing: {relative_path} ---")
-            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-
-            try:
-                with open(input_file_path, 'r', encoding='utf-8-sig') as f:
-                    text = f.read()
-                
-                if not text.strip():
-                    print("  -> Skipping empty file.")
+        for root, _, files in os.walk(input_dir_path):
+            for filename in files:
+                # We expand this to include other relevant file types
+                if not filename.endswith((".txt", ".gfx")):
                     continue
 
-                tokens = _tokenize(text)
-                parser = PdxParser(tokens)
-                parsed_data = parser.parse()
-                
-                with open(output_file_path, 'w', encoding='utf-8') as f:
-                    yaml.dump(parsed_data, f, default_flow_style=False, sort_keys=False, indent=2)
-                print(f"  -> Successfully parsed to: {os.path.relpath(output_file_path, output_dir_root)}")
+                input_file_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(input_file_path, vanilla_root)
+                output_file_path_no_ext, _ = os.path.splitext(os.path.join(output_dir_root, relative_path))
+                output_file_path = output_file_path_no_ext + ".yml"
 
-            except Exception as e:
-                print(f"  [ERROR] Failed to parse {filename}: {e}")
+                print(f"\n--- Processing: {relative_path} ---")
+                os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+
+                try:
+                    with open(input_file_path, 'r', encoding='utf-8-sig') as f:
+                        text = f.read()
+                    
+                    if not text.strip():
+                        print("  -> Skipping empty file.")
+                        continue
+
+                    tokens = _tokenize(text)
+                    parser = PdxParser(tokens)
+                    parsed_data = parser.parse()
+                    
+                    with open(output_file_path, 'w', encoding='utf-8') as f:
+                        yaml.dump(parsed_data, f, default_flow_style=False, sort_keys=False, indent=2)
+                    print(f"  -> Successfully parsed to: {os.path.relpath(output_file_path, output_dir_root)}")
+
+                except Exception as e:
+                    print(f"  [ERROR] Failed to parse {filename}: {e}")
 
     print("\n\nBatch parsing complete!")
 

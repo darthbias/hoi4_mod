@@ -86,28 +86,24 @@ def main():
     # 2. Build all files in the final list.
     print(f"Found {len(files_to_build)} files to build.")
     for relative_path, input_file_path in files_to_build.items():
-        for filename in files:
-            if not filename.endswith(".yml"):
-                continue
+        # Change the extension from .yml to .txt for the output
+        output_file_path_no_ext, _ = os.path.splitext(os.path.join(build_dir, relative_path))
+        output_file_path = output_file_path_no_ext + ".txt"
 
-            # Change the extension from .yml to .txt for the output
-            output_file_path_no_ext, _ = os.path.splitext(os.path.join(build_dir, relative_path))
-            output_file_path = output_file_path_no_ext + ".txt"
-
-            print(f"\n--- Building: {relative_path} ---")
-            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+        print(f"\n--- Building: {relative_path} ---")
+        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+        
+        try:
+            with open(input_file_path, 'r', encoding='utf-8') as f:
+                data = yaml.safe_load(f)
             
-            try:
-                with open(input_file_path, 'r', encoding='utf-8') as f:
-                    data = yaml.safe_load(f)
-                
-                pdx_content = dict_to_pdx_string(data)
-                
-                with open(output_file_path, 'w', encoding='utf-8-sig') as f:
-                    f.write(pdx_content)
-                print(f"  -> Successfully built to: {os.path.relpath(output_file_path, build_dir)}")
-            except Exception as e:
-                print(f"  [ERROR] Failed to build {filename}: {e}")
+            pdx_content = dict_to_pdx_string(data)
+            
+            with open(output_file_path, 'w', encoding='utf-8-sig') as f:
+                f.write(pdx_content)
+            print(f"  -> Successfully built to: {os.path.relpath(output_file_path, build_dir)}")
+        except Exception as e:
+            print(f"  [ERROR] Failed to build {relative_path}: {e}")
 
     print("\n\nFull build process complete!")
 
