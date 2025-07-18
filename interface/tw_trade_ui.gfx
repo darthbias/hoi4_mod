@@ -1,0 +1,6 @@
+spriteTypes = {
+	spriteType = {
+		name = "GFX_trade_header_bg_wide"
+		texturefile = "gfx/interface/trade/tw_trade_header_bg.dds"
+	}
+}

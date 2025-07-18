@@ -1,0 +1,13 @@
+﻿l_english:
+ PRODUCTION_MATERIALS_WAR_ANIMALS:0 "Horses, Camels, Elephants"
+ RESOURCE_WAR_ANIMALS:0 "Horses, Camels, Elephants"
+ war_animals_desc:0 "The combined availability of large animals for military use, including horses for traditional cavalry, and camels or elephants for logistics and combat in specialized environments."
+ GFX_trade_header_bg_wide:0 "Trade Header Wide"
+
+military_animal_equipment:0 "Military Animal Equipment"
+military_animal_equipment_short:0 "M. A. E."
+military_animal_equipment_desc:0 "The animals required to field cavalry and other specialized mobile units."
+military_animal_equipment_1936:0 "Military Animal Equipment (1936)"
+animal_training_center:0 "Animal Training Center"
+animal_training_center_desc:0 "A state-level facility dedicated to the procurement, breeding, and basic training of animals for military use, providing a steady supply of the 'War Animals' resource."
+

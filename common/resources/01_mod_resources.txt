@@ -1,0 +1,8 @@
+resources = {
+	war_animals = {
+		icon_frame = 7
+		cic = 0.125
+		convoys = 0.5 # Defines how many convoys it takes to ship 1 unit of horses overseas.
+
+	}
+}

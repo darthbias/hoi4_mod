@@ -1,0 +1,10 @@
+technologies = {
+	infantry_weapons = {
+		# This re-defines the enable_equipments block for the basic infantry weapons tech.
+		# By including the original infantry_equipment_0, we ensure we don't break anything.
+		enable_equipments = {
+			infantry_equipment_0
+			military_animal_equipment_1 # Unlocks our new equipment instead of the obsolete vanilla one
+		}
+	}
+}

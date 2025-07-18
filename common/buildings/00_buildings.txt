@@ -222,11 +222,10 @@ buildings = {
 	dockyard = {
 		show_on_map = 1
 		show_on_map_meshes = 3
-		base_cost = 6000
+		base_cost = 4500
 		only_costal = yes
 		naval_production = 1
 		icon_frame = 4
-		only_costal = yes
 		value = 5
 		infrastructure_construction_effect = yes
 		level_cap = {
@@ -381,7 +380,6 @@ buildings = {
 		rocket_production = 0
 		rocket_launch_capacity = 1
 		value = 1
-		tags = {}
 		infrastructure_construction_effect = yes
 		disabled_in_dmz = yes
 		spawn_point = rocket_site_spawn
@@ -423,6 +421,20 @@ buildings = {
 		}
 	}
 
+	animal_training_center = {
+		base_cost = 4500
+		icon_frame = 22 # Using an unused icon frame number, will need a GFX entry
+		local_resources_war_animals = 2 # Produces 2 units of the "horses" resource
+		value = 2
+		infrastructure_construction_effect = yes
+		show_modifier = yes
+
+		level_cap = {
+			shares_slots = yes # Shares building slots with factories
+			state_max = 5 # Max 5 per state
+		}
+	}
+	
 	nuclear_reactor_heavy_water = {
 		hide_if_missing_tech = yes
 		missing_tech_loc = { 

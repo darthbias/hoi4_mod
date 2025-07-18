@@ -214,6 +214,8 @@ script_enum_equipment_bonus_type = {
 	land_cruiser_equipment_1 #(No-NSB version)
 	destroyer
 	infantry_equipment
+	military_animal_equipment
+	military_animal_equipment_1
 	artillery_equipment
 	anti_tank_equipment
 	amphibious_mechanized_equipment

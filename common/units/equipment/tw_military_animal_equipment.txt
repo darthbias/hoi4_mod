@@ -1,0 +1,31 @@
+equipments = {
+	military_animal_equipment = {
+		is_archetype = yes # Defines this as a new category of equipment
+		is_buildable = no # The archetype itself isn't buildable, only its variants are
+		type = infantry # This correctly links it to the infantry tech tree for bonuses
+		group_by = archetype # This tells the UI how to group the equipment, like in the old file
+		interface_category = interface_category_land # This is the correct top-level UI category from the old file
+
+		active = yes # This makes the equipment available in production lists
+		# Stats are defined in the archetype, like in the old mod file
+		reliability = 0.7
+		maximum_speed = 5.4
+	
+		build_cost_ic = 1.33
+		resources = {
+		  steel = 1
+		  war_animals = 1 # This equipment now requires 1 unit of our new resource
+		}
+	
+	}
+
+	military_animal_equipment_1 = {
+		archetype = military_animal_equipment # Explicitly link to the parent archetype
+		is_buildable = yes # This specific model can be built
+
+		active = yes # This makes the equipment available in production lists
+
+		priority = 9
+		visual_level = 0
+	}
+}

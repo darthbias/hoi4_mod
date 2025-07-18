@@ -1,0 +1,8 @@
+sub_units = {
+	cavalry = {
+		need = {
+            infantry_equipment = 50 # This is the correct archetype name for guns
+			military_animal_equipment = 100 # Replaces the need for infantry_equipment
+		}
+	}
+}
