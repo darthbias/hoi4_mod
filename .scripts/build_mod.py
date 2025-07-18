@@ -71,11 +71,10 @@ def main():
         
         for root, _, files in os.walk(source_dir):
             for filename in files:
-                # We care about .yml for generation and .lua for copying
-                if filename.endswith((".yml", ".lua")):
-                    full_path = os.path.join(root, filename)
-                    relative_path = os.path.relpath(full_path, source_dir)
-                    source_files[relative_path] = full_path # Overwrites vanilla with mod version
+                # We process all files now, not just a specific list
+                full_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(full_path, source_dir)
+                source_files[relative_path] = full_path # Overwrites vanilla with mod version
 
     # 2. Process all gathered files.
     print(f"Found {len(source_files)} source files to process.")
@@ -86,11 +85,10 @@ def main():
             output_file_path_no_ext, _ = os.path.splitext(os.path.join(build_dir, relative_path))
             output_file_path = output_file_path_no_ext + ".txt"
             action = "build"
-        elif input_file_path.endswith(".lua"):
+        else:
+            # Any file that is not a .yml is treated as an asset to be copied directly.
             output_file_path = os.path.join(build_dir, relative_path)
             action = "copy"
-        else:
-            continue # Should not happen with our filter
 
         print(f"\n--- Processing: {relative_path} ---")
         os.makedirs(os.path.dirname(output_file_path), exist_ok=True)

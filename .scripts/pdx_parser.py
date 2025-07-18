@@ -119,6 +119,26 @@ def main():
     # We can add more here as needed (e.g., "decisions", "interface").
     target_directories = ["common", "events", "gfx", "interface"]
     
+    # --- ISOLATED DEBUGGING ---
+    # To debug a specific file, uncomment the lines below and run the script.
+    # This will help identify syntax issues in the parser.
+
+    # debug_file_path = "interface/frontendmultiplayerview.gfx"
+    # input_file_path = os.path.join(vanilla_root, debug_file_path)
+    # print(f"--- DEBUGGING SINGLE FILE: {debug_file_path} ---")
+    # try:
+    #     with open(input_file_path, 'r', encoding='utf-8-sig') as f:
+    #         text = f.read()
+    #     tokens = _tokenize(text)
+    #     parser = PdxParser(tokens)
+    #     parsed_data = parser.parse()
+    #     print("--- DEBUG PARSE SUCCESSFUL ---")
+    #     print(yaml.dump(parsed_data, default_flow_style=False, sort_keys=False, indent=2))
+    # except Exception as e:
+    #     print(f"[FATAL DEBUG ERROR] {e}")
+    # return # Exit after debugging
+
+
     # --- SCRIPT ---
     output_dir_root = os.path.join(os.path.dirname(__file__), '..', 'source_data', 'vanilla_base')
 
@@ -136,7 +156,7 @@ def main():
         for root, _, files in os.walk(input_dir_path):
             for filename in files:
                 # We expand this to include other relevant file types
-                if not filename.endswith((".txt", ".gfx", ".gui", ".asset")):
+                if not filename.lower().endswith((".txt", ".gfx", ".asset")):
                     continue
 
                 input_file_path = os.path.join(root, filename)
@@ -152,7 +172,9 @@ def main():
                         text = f.read()
                     
                     if not text.strip():
-                        print("  -> Skipping empty file.")
+                        print("  -> File is empty or contains only comments. Creating empty YAML file.")
+                        with open(output_file_path, 'w', encoding='utf-8') as f:
+                            f.write("# This file was empty or contained only comments in the vanilla game.\n")
                         continue
 
                     tokens = _tokenize(text)

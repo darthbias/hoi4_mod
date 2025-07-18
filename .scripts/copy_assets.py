@@ -12,8 +12,8 @@ def main():
     vanilla_root = "c:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"
     output_dir_root = os.path.join(os.path.dirname(__file__), '..', 'source_data', 'vanilla_base')
     
-    # Define file extensions to copy directly
-    asset_extensions = (".lua", ".dds", ".tga", ".shader", ".cur", ".bmp", ".font") # We can add more here later if needed
+    # Define file extensions that are handled by the PARSER. We will copy everything else.
+    PARSABLE_EXTENSIONS = (".txt", ".gfx", ".asset")
     
     # Define directories to scan
     target_directories = ["common", "events", "gfx", "interface"]
@@ -28,7 +28,7 @@ def main():
 
         for root, _, files in os.walk(input_dir_path):
             for filename in files:
-                if filename.endswith(asset_extensions):
+                if not filename.lower().endswith(PARSABLE_EXTENSIONS):
                     input_file_path = os.path.join(root, filename)
                     relative_path = os.path.relpath(input_file_path, vanilla_root)
                     output_file_path = os.path.join(output_dir_root, relative_path)
