@@ -4,6 +4,7 @@
 import re
 import yaml # Requires PyYAML: pip install pyyaml
 import os
+from _config import VANILLA_ROOT, VANILLA_BASE_DIR, PARSER_TARGET_DIRS, EXCLUSION_LIST
 
 def _tokenize(text):
     """
@@ -114,15 +115,11 @@ def main():
     Main function to parse an entire directory of vanilla files and output them as YAML.
     """
     # --- CONFIGURATION ---
-    vanilla_root = "c:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"
-    # A list of all top-level directories we want to parse from the vanilla game.
-    # We can add more here as needed (e.g., "decisions", "interface").
-    target_directories = ["common", "events", "gfx", "interface"]
-    
+    # Configuration is now imported from _config.py
+
     # --- ISOLATED DEBUGGING ---
     # To debug a specific file, uncomment the lines below and run the script.
     # This will help identify syntax issues in the parser.
-
     # debug_file_path = "interface/frontendmultiplayerview.gfx"
     # input_file_path = os.path.join(vanilla_root, debug_file_path)
     # print(f"--- DEBUGGING SINGLE FILE: {debug_file_path} ---")
@@ -138,15 +135,12 @@ def main():
     #     print(f"[FATAL DEBUG ERROR] {e}")
     # return # Exit after debugging
 
-
     # --- SCRIPT ---
-    output_dir_root = os.path.join(os.path.dirname(__file__), '..', 'source_data', 'vanilla_base')
-
-    for target_directory in target_directories:
-        input_dir_path = os.path.join(vanilla_root, target_directory)
+    for target_directory in PARSER_TARGET_DIRS:
+        input_dir_path = os.path.join(VANILLA_ROOT, target_directory)
 
         if not os.path.exists(input_dir_path):
-            print(f"[WARNING] Vanilla directory not found, skipping: {input_dir_path}")
+            print(f"[WARNING] Parser directory not found, skipping: {input_dir_path}")
             continue
 
         print(f"\n==================================================")
@@ -160,8 +154,14 @@ def main():
                     continue
 
                 input_file_path = os.path.join(root, filename)
-                relative_path = os.path.relpath(input_file_path, vanilla_root)
-                output_file_path_no_ext, _ = os.path.splitext(os.path.join(output_dir_root, relative_path))
+                relative_path = os.path.relpath(input_file_path, VANILLA_ROOT)
+                
+                # Check if the file is in our exclusion list
+                if relative_path.replace('\\', '/') in EXCLUSION_LIST:
+                    print(f"  -> Skipping excluded file: {relative_path}")
+                    continue
+
+                output_file_path_no_ext, _ = os.path.splitext(os.path.join(VANILLA_BASE_DIR, relative_path))
                 output_file_path = output_file_path_no_ext + ".yml"
 
                 print(f"\n--- Processing: {relative_path} ---")
@@ -183,7 +183,7 @@ def main():
                     
                     with open(output_file_path, 'w', encoding='utf-8') as f:
                         yaml.dump(parsed_data, f, default_flow_style=False, sort_keys=False, indent=2)
-                    print(f"  -> Successfully parsed to: {os.path.relpath(output_file_path, output_dir_root)}")
+                    print(f"  -> Successfully parsed to: {os.path.relpath(output_file_path, VANILLA_BASE_DIR)}")
 
                 except Exception as e:
                     print(f"  [ERROR] Failed to parse {filename}: {e}")

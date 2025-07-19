@@ -2,6 +2,7 @@
 # A script to copy non-parsable but necessary files (like .lua) into our source tree.
 
 import os
+from _config import VANILLA_ROOT, VANILLA_BASE_DIR, ASSET_TARGET_DIRS, EXCLUSION_LIST
 import shutil
 
 def main():
@@ -9,29 +10,27 @@ def main():
     Main function to copy asset files from the vanilla game directory.
     """
     # --- CONFIGURATION ---
-    vanilla_root = "c:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV"
-    output_dir_root = os.path.join(os.path.dirname(__file__), '..', 'source_data', 'vanilla_base')
-    
+    # Configuration is now imported from _config.py
     # Define file extensions that are handled by the PARSER. We will copy everything else.
     PARSABLE_EXTENSIONS = (".txt", ".gfx", ".asset")
-    
-    # Define directories to scan
-    target_directories = ["common", "events", "gfx", "interface"]
 
     # --- SCRIPT ---
     print("Starting asset copy process...")
-    for target_dir in target_directories:
-        input_dir_path = os.path.join(vanilla_root, target_dir)
+    for target_dir in ASSET_TARGET_DIRS:
+        input_dir_path = os.path.join(VANILLA_ROOT, target_dir)
         if not os.path.exists(input_dir_path):
             print(f"[WARNING] Directory not found, skipping: {input_dir_path}")
             continue
 
         for root, _, files in os.walk(input_dir_path):
             for filename in files:
-                if not filename.lower().endswith(PARSABLE_EXTENSIONS):
-                    input_file_path = os.path.join(root, filename)
-                    relative_path = os.path.relpath(input_file_path, vanilla_root)
-                    output_file_path = os.path.join(output_dir_root, relative_path)
+                input_file_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(input_file_path, VANILLA_ROOT).replace('\\', '/')
+
+                # We copy a file if it's on the exclusion list OR if it's not a parsable type.
+                if relative_path in EXCLUSION_LIST or not filename.lower().endswith(PARSABLE_EXTENSIONS):
+                    # Use the os-specific separator for the output path
+                    output_file_path = os.path.join(VANILLA_BASE_DIR, relative_path.replace('/', os.sep))
                     
                     print(f"  -> Copying: {relative_path}")
                     os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
